@@ -14,24 +14,33 @@ import AuthService from "../../../shared/services/auth.service";
 import { useNavigate } from "react-router-dom";
 import CardContent from "@mui/material/CardContent";
 import Card from "@mui/material/Card";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const authService = new AuthService();
 
+const loginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8,"Password must contains 8 characters").max(32,"Password length should be less than 32 characters"),
+});
+
+type LoginSchema = z.infer<typeof loginSchema>;
+
 export default function Login() {
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    shouldFocusError: true,
+  });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    let form = {
-      email: data.get("email") as string,
-      password: data.get("password") as string,
-    };
-
+  const onSubmit = async (form: LoginSchema) => {
     try {
-      let login = await authService.login(
-        form as { email: string; password: string }
-      );
+      let login = await authService.login(form);
       console.log(login);
       if (login.token) {
         localStorage.setItem("token", login.token);
@@ -50,7 +59,7 @@ export default function Login() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: "100vh",
+          height: "calc(100vh - 68px)",
         }}
       >
         <Card>
@@ -60,13 +69,13 @@ export default function Login() {
                 <LockOutlinedIcon />
               </Avatar>
               <Typography component="h1" variant="h5">
-               Welcome back
+                Welcome back
               </Typography>
               <Typography paragraph>Please enter your details</Typography>
             </Box>
             <Box
               component="form"
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
               noValidate
               sx={{ mt: 1 }}
             >
@@ -75,13 +84,17 @@ export default function Login() {
                 required
                 fullWidth
                 id="email"
+                {...register("email")}
                 label="Email Address"
                 name="email"
                 autoComplete="email"
                 autoFocus
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
               <TextField
                 margin="normal"
+                {...register("password")}
                 required
                 fullWidth
                 name="password"
@@ -89,6 +102,8 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                error={!!errors.password}
+                helperText={errors.password?.message}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -99,12 +114,15 @@ export default function Login() {
                 fullWidth
                 variant="contained"
                 size="large"
-                sx={{ mt: 2, mb: 2}}
+                sx={{ mt: 2, mb: 2 }}
               >
                 Login
               </Button>
               <Box textAlign={"center"}>
-             {"Don't have an account?"} <Link component={RLink} to="/sign-up" variant="body2">Sign up</Link>
+                {"Don't have an account?"}{" "}
+                <Link component={RLink} to="/sign-up" variant="body2">
+                  Sign up
+                </Link>
               </Box>
             </Box>
           </CardContent>

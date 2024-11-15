@@ -2,7 +2,7 @@ import { config } from "../../config";
 
 export default class AuthService {
   public async login(body: { email: string; password: string }): Promise<any> {
-    return fetch(config.apiUrl+"/api/login", {
+    return fetch(config.apiUrl+"/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -12,7 +12,7 @@ export default class AuthService {
   }
 
   public async getCurrentUser():Promise<any>{
-    return fetch(config.apiUrl+"/api/currentUser",{
+    return fetch(config.apiUrl+"/api/auth/currentUser",{
       headers:{
         "Authorization": "Bearer "+localStorage.getItem('token')
       }
