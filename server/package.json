@@ -1,0 +1,33 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "Chat app with socket.io",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon ./app.js",
+    "swagger:build": "node swagger.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RajeevSalaria/chat-app.git"
+  },
+  "author": "Rajeev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RajeevSalaria/chat-app/issues"
+  },
+  "homepage": "https://github.com/RajeevSalaria/chat-app#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.2.4",
+    "socket.io": "^4.7.5",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
