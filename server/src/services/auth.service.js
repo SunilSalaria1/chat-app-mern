@@ -1,20 +1,24 @@
 const User = require("../models/user.model");
+const HttpError = require("../utils/httpError");
 
 class AuthService {
   async login(body) {
     try {
       const user = await User.findOne({ email: body.email });
       if (!user) {
-        return false;
+        throw new HttpError("Invalid username or password", 404);
       }
       if (user.password !== body.password) {
-        return false;
+        throw new HttpError("Invalid username or password", 404);
       }
       const token = await user.generateAuthToken();
-      return token;
+      return { token, user };
     } catch (error) {
-      console.log(error)
-      return error;
+      if (error instanceof HttpError) {
+        throw error;
+      }
+
+      throw new HttpError("Internal server error, please try again later", 500);
     }
   }
 
@@ -27,7 +31,6 @@ class AuthService {
       return error;
     }
   }
-
 }
 
 module.exports = AuthService;

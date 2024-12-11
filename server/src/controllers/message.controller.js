@@ -1,4 +1,6 @@
 const Message = require("../models/message.model");
+const HttpError = require("../utils/httpError");
+
 const createMessage = async (req, res) => {
   /* 	#swagger.tags = ['Message']
        #swagger.description = 'Post a message.' */
@@ -36,7 +38,9 @@ const getMessages = async (req, res) => {
     }
     res.status(200).send(messages);
   } catch (error) {
-    console.log(error)
+    if (error instanceof HttpError) {
+      return res.status(error.statusCode).send({ error: error.message });
+    }
     res.status(500).send(error);
   }
 };
@@ -48,6 +52,9 @@ const updateMessage = async (req, res) => {
     await Message.findByIdAndUpdate(req.params.id, req.body);
     res.status(200).send("Message updated successfully");
   } catch (error) {
+    if (error instanceof HttpError) {
+      return res.status(error.statusCode).send({ error: error.message });
+    }
     res.status(500).send(error);
   }
 };
@@ -59,6 +66,9 @@ const deleteMessage = async (req, res) => {
     await Message.findByIdAndDelete(req.params.id);
     res.status(200).send("Message deleted successfully");
   } catch (error) {
+    if (error instanceof HttpError) {
+      return res.status(error.statusCode).send({ error: error.message });
+    }
     res.status(500).send(error);
   }
 };

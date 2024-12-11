@@ -5,7 +5,6 @@ import { RouterProvider } from "react-router-dom";
 import router from "./shared/router/router";
 import { createTheme } from "@mui/material";
 import { ThemeModeContext } from "./shared/context/context";
-import "./index.css";
 import theme from "./theme";
 export const socket = io("http://localhost:3100");
 
