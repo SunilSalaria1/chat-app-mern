@@ -11,13 +11,14 @@ class AuthService {
       if (user.password !== body.password) {
         throw new HttpError("Invalid username or password", 404);
       }
-      const token = await user.generateAuthToken();
+      user.tokenVersion++;
+      const token = await user.generateAuthToken(user.tokenVersion);
       return { token, user };
     } catch (error) {
       if (error instanceof HttpError) {
         throw error;
       }
-
+           console.log(error);
       throw new HttpError("Internal server error, please try again later", 500);
     }
   }
@@ -31,6 +32,8 @@ class AuthService {
       return error;
     }
   }
+
+  async logout() {}
 }
 
 module.exports = AuthService;
