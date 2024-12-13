@@ -12,9 +12,11 @@ const register = async (req, res) => {
               description: 'Add new user.',
               schema: { $ref: '#/definitions/User' }
       } */
-    const user = service.createUser(req.body);
-    res.status(201).send(user);
+    const user = await service.register(req.body);
+    console.log(user, "created");
+    res.status(204).send();
   } catch (error) {
+    console.error(error, "error creating user");
     if (error instanceof HttpError) {
       return res.status(error.statusCode).send({ error: error.message });
     }
@@ -30,6 +32,22 @@ const login = async (req, res) => {
   try {
     const user = await service.login(req.body);
     res.status(201).send({ token: user.token });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      return res.status(error.statusCode).send({ error: error.message });
+    }
+    res.status(500).send(error);
+  }
+};
+
+const logout = async (req, res) => {
+  /* 	#swagger.tags = ['Auth']
+          #swagger.description = 'Endpoint to sign out'
+            #swagger.schema: { $ref: '#/definitions/Auth' }
+          */
+  try {
+    await service.logout(req.token, req.user._id);
+    res.status(201).send(true);
   } catch (error) {
     if (error instanceof HttpError) {
       return res.status(error.statusCode).send({ error: error.message });
@@ -63,4 +81,5 @@ module.exports = {
   register,
   login,
   getCurrentUser,
+  logout,
 };

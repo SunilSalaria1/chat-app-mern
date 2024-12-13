@@ -18,22 +18,44 @@ class AuthService {
       if (error instanceof HttpError) {
         throw error;
       }
-           console.log(error);
+      console.log(error);
       throw new HttpError("Internal server error, please try again later", 500);
     }
   }
 
   async register(user) {
     try {
+      const isAlreadyExist = await User.findOne({ email: user.email });
+      if (isAlreadyExist) {
+        throw new HttpError("Email already in use", 409);
+      }
       const newUser = new User(user);
       await newUser.save();
       return newUser;
     } catch (error) {
-      return error;
+      if (error instanceof HttpError) {
+        throw error;
+      }
+      throw new HttpError("Internal server error, please try again later", 500);
     }
   }
 
-  async logout() {}
+  async logout(token, userID) {
+    try {
+      const user = await User.findById(userID);
+      const isToken =user.tokens.some((el) => el.token === token);
+      if (!isToken) {
+        throw new HttpError("Invalid token", 401);
+      }
+      user.tokens = user.tokens.filter((el) => el.token !== token);
+      await user.save();
+    } catch (error) {
+      if (error instanceof HttpError) {
+        throw error;
+      }
+      throw new HttpError("Internal server error, please try again later", 500);
+    }
+  }
 }
 
 module.exports = AuthService;

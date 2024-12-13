@@ -264,13 +264,11 @@ function AdminLayout() {
                   : theme.palette.grey[800],
             }}
           >
-            {(state?._id || params.id) && (
               <Header
                 isOpen={mobileOpen}
                 handleDrawerToggle={handleDrawerToggle}
                 drawerWidth={drawerWidth}
               />
-            )}
             <Sidebar
               currentUser={loaderData}
               activeUsers={activeUsers}

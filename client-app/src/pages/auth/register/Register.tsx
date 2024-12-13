@@ -17,13 +17,14 @@ import {
   RadioGroup,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Link as RLink } from "react-router-dom";
+import { Link as RLink, useNavigate } from "react-router-dom";
 import { Verified } from "@mui/icons-material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import AuthService from "../../../shared/services/auth.service";
 
 export const registerSchema = z
   .object({
@@ -34,7 +35,9 @@ export const registerSchema = z
     confirmPassword: z
       .string()
       .min(6, "Confirm Password must be at least 6 characters long"),
-    gender: z.enum(['male', 'female','other'], { message: 'Please select a gender' }),
+    gender: z.enum(["male", "female", "other"], {
+      message: "Please select a gender",
+    }),
     dateOfBirth: z
       .string({ message: "Date of birth is required" })
       .transform((e) => new Date(e)),
@@ -49,13 +52,16 @@ export const registerSchema = z
     }
   );
 
-type RegisterSchema = z.infer<typeof registerSchema>;
+export type RegisterSchema = z.infer<typeof registerSchema>;
+
+const authService = new AuthService();
 
 function Register() {
   const [passwordVisible, setPasswordVisible] = useState({
     showConfirmPassword: false,
     showPassword: false,
   });
+  const navigate = useNavigate();
 
   const {
     register,
@@ -73,7 +79,13 @@ function Register() {
   });
 
   const onSubmit = async (data: RegisterSchema) => {
-    console.log(data);
+    try {
+      const response = await authService.register(data);
+      if (!response?.error) navigate("/sign-in");
+    } catch (error) {
+      console.error("Error registering user:", error);
+      alert("Error registering user");
+    }
   };
 
   return (
@@ -174,7 +186,7 @@ function Register() {
                       value={value}
                       onChange={onChange}
                     >
-                                            <FormControlLabel
+                      <FormControlLabel
                         value="male"
                         control={<Radio />}
                         label="Male"
