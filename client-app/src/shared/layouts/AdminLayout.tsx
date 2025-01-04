@@ -41,7 +41,7 @@ import SendIcon from "@mui/icons-material/Send";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ReactTimeAgo from "react-time-ago";
 import Picker, { EmojiClickData } from "emoji-picker-react";
-import { CurrentUserContext, ReducerContext } from "../context/context";
+import { CurrentUserContext, UserContext } from "../context/context";
 import { currentSelectedUserReducer } from "../reducers/reducer";
 import {
   Badge,
@@ -177,6 +177,11 @@ function AdminLayout() {
     console.log(m, messageReceived, "received");
   });
 
+  socket.on("end_typing", (data) => {
+  console.log('typing',data)
+  })
+
+
   function onConnect() {
     const sessionID = socket.id;
     console.log("Connected with sessionID: ", sessionID);
@@ -233,16 +238,20 @@ function AdminLayout() {
     setMessage((prev) => prev + emojiObject.emoji);
   };
 
-  console.log("loaded");
 
   useEffect(() => {
     setFooterHeight((ref.current as any)?.clientHeight);
     console.log(ref.current?.clientHeight);
   }, [setFooterHeight]);
 
+  const handleKeyUp = () => {
+    console.log("handleKeyUp");
+    socket.emit("start_typing");
+  }
+
   return (
     <CurrentUserContext.Provider value={loaderData}>
-      <ReducerContext.Provider value={contextValue}>
+      <UserContext.Provider value={contextValue}>
         <Box
           sx={{
             width: {
@@ -264,11 +273,11 @@ function AdminLayout() {
                   : theme.palette.grey[800],
             }}
           >
-              <Header
-                isOpen={mobileOpen}
-                handleDrawerToggle={handleDrawerToggle}
-                drawerWidth={drawerWidth}
-              />
+            <Header
+              isOpen={mobileOpen}
+              handleDrawerToggle={handleDrawerToggle}
+              drawerWidth={drawerWidth}
+            />
             <Sidebar
               currentUser={loaderData}
               activeUsers={activeUsers}
@@ -541,6 +550,7 @@ function AdminLayout() {
                 value={parentMessage}
                 rows={2}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyUp={(e)=>handleKeyUp()}
                 variant="outlined"
                 sx={{
                   mr: 3,
@@ -590,7 +600,7 @@ function AdminLayout() {
             </Collapse>
           </Paper>
         </Box>
-      </ReducerContext.Provider>
+      </UserContext.Provider>
     </CurrentUserContext.Provider>
   );
 }

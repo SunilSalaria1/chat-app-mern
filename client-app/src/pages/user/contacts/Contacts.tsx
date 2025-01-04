@@ -2,7 +2,7 @@ import { Box, Divider, InputAdornment, List, ListItem, ListItemButton, Stack, Te
 import React, { Dispatch, useContext, useEffect, useState } from 'react'
 import ContactService from '../../../shared/services/contacts.service';
 import { IUser } from '../../../shared/models';
-import { CurrentUserContext, IReducer, ReducerContext } from '../../../shared/context/context';
+import { CurrentUserContext, IUserContext, UserContext } from '../../../shared/context/context';
 import { Search } from '@mui/icons-material';
 import { UserAction } from '../../../shared/reducers/reducer';
 
@@ -17,7 +17,7 @@ function Contacts() {
   const [value, setValue] = useState<string>('');
 	const [contacts, setContacts] = useState<{isFavoriteUser:boolean,user:IUser,_id:string}[]>([]);
   const currentUser = useContext(CurrentUserContext) as IUser;
-	const reducerContext = useContext(ReducerContext) as IReducer;
+	const reducerContext = useContext(UserContext) as IUserContext;
 
 	useEffect(() => {
 		const controller = new AbortController();

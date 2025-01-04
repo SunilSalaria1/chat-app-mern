@@ -56,6 +56,10 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("receive_message", data);
   });
 
+  socket.on("start_typing", (data) => {
+    socket.broadcast.emit("end_typing",true)
+  })
+
 
   const count2 = io.of("/").sockets.size;
   console.log("user connected", socket.id, count2);

@@ -30,7 +30,7 @@ const roomSchema = mongoose.Schema(
     ],
     isGroup: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     groupIcon: {
       type: String,
@@ -42,7 +42,6 @@ const roomSchema = mongoose.Schema(
         required: true,
       },
     ],
-    
   },
   { timestamps: true }
 );
