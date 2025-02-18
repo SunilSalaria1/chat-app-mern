@@ -27,7 +27,7 @@ const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z
     .string()
-    .min(8, "Password must contains 8 characters")
+    .min(8, "Password must contain 8 characters")
     .max(32, "Password length should be less than 32 characters"),
 });
 
@@ -65,7 +65,7 @@ export default function Login() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: "calc(100vh - 68px)",
+          minHeight: "calc(100vh - 45px)",
         }}
       >
         <Card>
@@ -148,7 +148,7 @@ export default function Login() {
               >
                 Login
               </Button>
-              <Box textAlign={"center"}>
+              <Box textAlign={"center"} fontFamily="default" fontSize="small">
                 {"Don't have an account?"}{" "}
                 <Link component={RLink} to="/sign-up" variant="body2">
                   Sign up

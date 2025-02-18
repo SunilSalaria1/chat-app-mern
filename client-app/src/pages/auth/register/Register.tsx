@@ -34,7 +34,7 @@ export const registerSchema = z
     password: z.string().min(6, "Password must be at least 6 characters long"),
     confirmPassword: z
       .string()
-      .min(6, "Confirm Password must be at least 6 characters long"),
+      .min(6, "Confirm password must be at least 6 characters long"),
     gender: z.enum(["male", "female", "other"], {
       message: "Please select a gender",
     }),
@@ -96,7 +96,7 @@ function Register() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: "calc(100vh - 68px)",
+          minHeight: "calc(100vh - 45px)",
         }}
       >
         <Card>
@@ -109,7 +109,7 @@ function Register() {
                 Create your account
               </Typography>
               <Typography paragraph>
-                Let's create your profile in 2 minutes.
+                Let's quickly create your profile
               </Typography>
             </Box>
             <Box
@@ -252,7 +252,7 @@ function Register() {
                 helperText={errors.confirmPassword?.message}
                 name="confirmPassword"
                 label="Confirm password"
-                type="password"
+                type={passwordVisible.showConfirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 autoComplete="current-password"
                 InputProps={{
@@ -291,7 +291,7 @@ function Register() {
               >
                 Register
               </Button>
-              <Box textAlign={"center"}>
+              <Box textAlign={"center"} fontFamily="default" fontSize="small">
                 Already have an account?{" "}
                 <Link component={RLink} to="/sign-in" variant="body2">
                   Sign in
