@@ -8,8 +8,8 @@ const {
 } = require("../controllers/user.controller");
 
 userRoutes.get("/users", getUsers);
-userRoutes.get("/user/:id", getUserById);
-userRoutes.put("/user", updateUser);
-userRoutes.delete("/user/:id", deleteUser);
+userRoutes.get("/users/:id", getUserById);
+userRoutes.put("/users/:id", updateUser);
+userRoutes.delete("/users/:id", deleteUser);
 
 module.exports = userRoutes;

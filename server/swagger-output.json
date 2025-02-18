@@ -86,8 +86,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "204": {
+            "description": "No Content"
           },
           "500": {
             "description": "Internal Server Error"
@@ -105,14 +105,33 @@
           {
             "name": "body",
             "in": "body",
+            "description": "Authorized a user.",
             "schema": {
-              "type": "object",
-              "properties": {
-                "password": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Login"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to sign out",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -144,12 +163,34 @@
         }
       }
     },
-    "/api/user/{id}": {
+    "/api/users/{id}": {
       "get": {
         "tags": [
           "User"
         ],
         "description": "Get user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "description": "Update user",
         "parameters": [
           {
             "name": "id",
@@ -180,22 +221,6 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/user": {
-      "put": {
-        "tags": [
-          "User"
-        ],
-        "description": "Update user",
         "responses": {
           "200": {
             "description": "OK"
@@ -314,7 +339,7 @@
         }
       }
     },
-    "/api/room": {
+    "/api/rooms": {
       "post": {
         "tags": [
           "Rooms"
@@ -354,7 +379,7 @@
         }
       }
     },
-    "/api/room/{id}": {
+    "/api/rooms/{id}": {
       "put": {
         "tags": [
           "Rooms"
@@ -425,11 +450,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/api/contact": {
+    "/api/contacts": {
       "post": {
         "tags": [
           "Contacts"
@@ -448,15 +476,27 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     }
   },
   "definitions": {
-    "Auth": {
+    "Login": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test@example.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "************"
+        }
+      }
     },
     "User": {
       "type": "object",
@@ -473,17 +513,21 @@
           "type": "string",
           "example": "rajeev@gmail.com"
         },
+        "gender": {
+          "type": "string",
+          "example": "male"
+        },
         "password": {
           "type": "string",
-          "example": "12345678"
+          "example": "************"
         },
         "confirmPassword": {
           "type": "string",
-          "example": "12345678"
+          "example": "************"
         },
         "dateOfBirth": {
           "type": "string",
-          "example": "Thu Dec 05 2024 18:46:59 GMT+0530 (India Standard Time)"
+          "example": "Tue Feb 18 2025 15:59:15 GMT+0530 (India Standard Time)"
         }
       }
     },
@@ -514,19 +558,19 @@
       "properties": {
         "name": {
           "type": "string",
-          "example": "Room 1"
+          "example": "Test room"
         },
         "description": {
           "type": "string",
-          "example": "Room 1 description"
+          "example": "Test room description"
         },
         "createdBy": {
           "type": "string",
-          "example": "60f3b7f9e6b2e32f6c2b9f6a"
+          "example": ""
         },
         "updatedBy": {
           "type": "string",
-          "example": "60f3b7f9e6b2e32f6c2b9f6a"
+          "example": ""
         },
         "members": {
           "type": "array",

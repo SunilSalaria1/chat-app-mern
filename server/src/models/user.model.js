@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -72,6 +72,9 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     const hashedPassword = await bcrypt.hash(this.password, 10);
     this.password = hashedPassword;
+    this.confirmPassword = undefined;
+  }
+  if (this.isModified("confirmPassword")) {
     this.confirmPassword = undefined;
   }
   next();

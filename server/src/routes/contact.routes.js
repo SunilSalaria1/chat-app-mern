@@ -3,6 +3,6 @@ const { getContacts,createContact } = require('../controllers/contact.controller
 const contactRouter = express.Router();
 
 contactRouter.get('/contacts/:id',getContacts);
-contactRouter.post('/contact',createContact);
+contactRouter.post('/contacts',createContact);
 
 module.exports = contactRouter;

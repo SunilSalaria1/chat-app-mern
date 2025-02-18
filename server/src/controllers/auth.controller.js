@@ -27,7 +27,11 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   /* 	#swagger.tags = ['Auth']
           #swagger.description = 'Endpoint to sign in a specific user'
-            #swagger.schema: { $ref: '#/definitions/Auth' }
+              #swagger.parameters['body'] = {
+              in: 'body',
+              description: 'Authorized a user.',
+              schema: { $ref: '#/definitions/Login' }
+      } 
           */
   try {
     const user = await service.login(req.body);
@@ -43,7 +47,6 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   /* 	#swagger.tags = ['Auth']
           #swagger.description = 'Endpoint to sign out'
-            #swagger.schema: { $ref: '#/definitions/Auth' }
           */
   try {
     await service.logout(req.token, req.user._id);

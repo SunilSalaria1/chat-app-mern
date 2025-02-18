@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
-const messageSchema = mongoose.Schema({
+const messageSchema = new mongoose.Schema({
     parentMessage:{
-        type:String,
-        required:true,
-        min: 6,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message',
     },
     message: {
         type: String,
@@ -15,22 +14,6 @@ const messageSchema = mongoose.Schema({
         ref: 'User',
         required: true
     },
-    room: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Room',
-        default:null,
-        required: function() { return !this.isContactEntity; }
-    },
-    isContactEntity:{
-        type:Boolean,
-        default: false
-    },
-    contactName:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        default:null,
-        required: function() { return this.isContactEntity;}
-    }
 }, { timestamps: true })
 
 const Message = mongoose.model('Message', messageSchema);

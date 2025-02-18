@@ -1,17 +1,18 @@
 const mongoose = require("mongoose");
 
-const roomSchema = mongoose.Schema(
+const roomSchema =new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      min: 6,
+      unique: true,
+      minLength: 6,
     },
     description: {
       type: String,
       required: true,
-      min: 6,
-      max: 255,
+      minLength: 6,
+      maxLength: 255,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -45,6 +46,9 @@ const roomSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Adding an index to frequently queried fields
+roomSchema.index({ name: 1 });
 
 const Room = mongoose.model("Room", roomSchema);
 

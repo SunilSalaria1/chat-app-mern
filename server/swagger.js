@@ -34,8 +34,9 @@ const doc = {
       firstName: "Rajeev",
       lastName: "Salaria",
       email: "rajeev@gmail.com",
-      password: "12345678",
-      confirmPassword: "12345678",
+      gender: "male",
+      password: "************",
+      confirmPassword: "************",
       dateOfBirth: new Date().toString(),
     },
     Message: {
@@ -46,10 +47,10 @@ const doc = {
       contactName:null
     },
     Room: {
-      name: "Room 1",
-      description: "Room 1 description",
-      createdBy: "60f3b7f9e6b2e32f6c2b9f6a",
-      updatedBy: "60f3b7f9e6b2e32f6c2b9f6a",
+      name: "Test room",
+      description: "Test room description",
+      createdBy: "",
+      updatedBy: "",
       members: ["60f3b7f9e6b2e32f6c2b9f6a"],
       messages: ["60f3b7f9e6b2e32f6c2b9f6a"],
       isGroup: false,
