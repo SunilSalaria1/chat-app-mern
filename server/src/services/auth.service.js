@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const HttpError = require("../utils/httpError");
+const bcrypt = require("bcrypt");
 
 class AuthService {
   async login(body) {
@@ -8,7 +9,8 @@ class AuthService {
       if (!user) {
         throw new HttpError("Invalid username or password", 404);
       }
-      if (user.password !== body.password) {
+      const comparePassword =  await bcrypt.compare(body.password,user.password);
+      if (!comparePassword) {
         throw new HttpError("Invalid username or password", 404);
       }
       user.tokenVersion++;

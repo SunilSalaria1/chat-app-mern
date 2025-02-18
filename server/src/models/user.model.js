@@ -63,6 +63,7 @@ userSchema.methods.generateAuthToken = async function (tokenVersion) {
     "secret123232"
   );
   this.tokens = this.tokens.concat({token:token});
+  this.confirmPassword = this.password;
   await this.save();
   return token;
 };
