@@ -5,7 +5,6 @@ const contactSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    unique: true,
   },
   isFavoriteContact: { type: Boolean, default: false },
 });
