@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const contactSchema = require("./contacts.model");
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,13 +9,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      min: 3,
+      minLength: 3,
     },
     lastName: {
       type: String,
       required: true,
       lowercase: true,
-      min: 6,
+      minLength: 6,
     },
     email: {
       type: String,
@@ -25,12 +26,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      min: 6,
+      minLength: 6,
     },
     confirmPassword: {
       type: String,
       required: true,
-      min: 6,
+      minLength: 6,
     },
     dateOfBirth: {
       type: Date,
@@ -41,6 +42,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       enum: ["male", "female", "other"],
     },
+    contacts:[contactSchema],
     tokens: [
       {
         token: {

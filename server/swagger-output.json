@@ -477,6 +477,9 @@
           "200": {
             "description": "OK"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -527,7 +530,7 @@
         },
         "dateOfBirth": {
           "type": "string",
-          "example": "Tue Feb 18 2025 15:59:15 GMT+0530 (India Standard Time)"
+          "example": "Wed Feb 19 2025 13:38:52 GMT+0530 (India Standard Time)"
         }
       }
     },
