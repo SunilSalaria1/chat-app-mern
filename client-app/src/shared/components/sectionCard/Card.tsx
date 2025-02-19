@@ -9,6 +9,7 @@ function SectionCard(props: IProps) {
     <Card
       variant="outlined"
       sx={{
+        borderRadius:"8px",
         transition: "linear 300ms",
         "&:hover": {
           transform: "scale(1.1)",

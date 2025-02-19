@@ -1,14 +1,14 @@
-html,body{
+html,
+body {
   margin: 0;
   padding: 0;
 }
 
 /* auth pages */
-.auth-bg{
-  background-image: url('./assets/auth-bg.png');
+.auth-bg {
+  background-image: url("./assets/auth-bg.png");
 }
 
-.MuiInputLabel-asterisk{
-  color:red !important;
+.MuiInputLabel-asterisk {
+  color: red !important;
 }
-

@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import React, { useContext } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
+import LogoutIcon from '@mui/icons-material/Logout';
 import {useNavigate } from "react-router-dom";
 import {
   UserContext,IUserContext
@@ -32,16 +34,15 @@ function Header(props: {
           sm: !props.isOpen ? `calc(100% - 164px)` : "calc(100% - 430px)",
         },
         ml: { sm: !props.isOpen ? "164px" : "430px" },
-        backdropFilter: "blur(7px)",
         backgroundColor:
-          theme.palette.mode === "light" ? "#b5adad0d" : "#3e3d3d6e",
+          theme.palette.mode === "light" ? "white" : "black",
         color:
           theme.palette.mode === "light"
             ? theme.palette.common.black
             : theme.palette.common.white,
       }}
     >
-      <Toolbar sx={{ justifyContent: { lg: "space-between" } }}>
+      <Toolbar sx={{ justifyContent: { lg: "space-between"} }}>
         <IconButton
           color="inherit"
           aria-label="open drawer"
@@ -51,11 +52,18 @@ function Header(props: {
         >
           <MenuIcon />
         </IconButton>
-        <Box>
-          <Typography variant="h6" noWrap component="div">
+        <Typography variant="h6" noWrap component="div">
             {state ? state.name ?? (state?.firstName + " " + state?.lastName) : ""}
-          </Typography>
+          </Typography> 
+        <Box>
+          <IconButton  color="inherit" sx={{ mr: 1}}>
+          <NotificationImportantIcon/>
+        </IconButton>
+        <IconButton  color="inherit">
+          <LogoutIcon/>
+        </IconButton>
         </Box>
+        
       </Toolbar>
     </AppBar>
   );

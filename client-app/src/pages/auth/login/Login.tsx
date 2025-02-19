@@ -27,8 +27,8 @@ const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z
     .string()
-    .min(8, "Password must contain 8 characters")
-    .max(32, "Password length should be less than 32 characters"),
+    // .min(8, "Password must contain 8 characters")
+    // .max(32, "Password length should be less than 32 characters"),
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;

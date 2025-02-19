@@ -11,10 +11,17 @@ import {
   ListItemButton,
   Stack,
   Badge,
+  Avatar,
+  Card,
+  CardHeader,
+  IconButton,
+  CardActions,
 } from "@mui/material";
 import { IActiveUser } from "../../../shared/layouts/AdminLayout";
 import { IUserContext, UserContext } from "../../../shared/context/context";
 import { Dispatch } from "react";
+import { red } from "@mui/material/colors";
+import MenuIcon from "@mui/icons-material/Menu";
 
 function RoomsUser() {
   const roomsData = useLoaderData() as IRoom[];
@@ -35,23 +42,24 @@ function RoomsUser() {
     <>
       <Toolbar>Users</Toolbar>
       <Divider />
-      <Typography variant="subtitle2" pt={1} px={3}>
+      <Typography variant="subtitle2" pt={1} px={3} color="primary">
         Favorites
       </Typography>
       <List>
-        <ListItem disablePadding sx={{ display: "block" }}>
           {roomsData.map((el) =>
             el.members.map((user) => (
+              <ListItem disablePadding sx={{ display: "block" }} key={user._id}>
               <ListItemButton
-                key={user._id}
                 sx={{
+                  borderBottom: 1,
+                  borderColor: "grey.300",
                   minHeight: 48,
-                  px: 2.5,
+                  pl:"24px"
                 }}
               >
-                <Stack direction={"row"}>
+                <Stack direction="row" width="100%">
                   <Badge
-                    sx={{
+                    sx={{ 
                       "& .MuiBadge-dot": {
                         top: "auto",
                         bottom: "-1px",
@@ -62,7 +70,7 @@ function RoomsUser() {
                       activeUserContext.find(
                         (activeUser) => activeUser.userId === user._id
                       ) ?? ""
-                        ? "success"
+                        ? "success" 
                         : "error"
                     }
                     variant={"dot"}
@@ -72,14 +80,14 @@ function RoomsUser() {
                       alt="loading"
                     />
                   </Badge>
-                  <Typography variant="subtitle2" ml={2}>
+                  <Typography variant="subtitle2" ml={2} style={{textTransform:"capitalize"}}>
                     {user.firstName + " " + user.lastName}
                   </Typography>
                 </Stack>
               </ListItemButton>
+              </ListItem>
             ))
           )}
-        </ListItem>
       </List>
     </>
   );

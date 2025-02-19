@@ -5,6 +5,7 @@ import {
   Divider,
   Drawer,
   IconButton,
+  ImageListItem,
   List,
   ListItem,
   ListItemButton,
@@ -48,7 +49,7 @@ import { CurrentUserContext, ThemeModeContext } from "../../context/context";
 import ChatProfile from "./elements/ChatProfile";
 import ChatContacts from "./elements/ChatContacts";
 import AuthService from "../../services/auth.service";
-
+import logo from "../../../assets/chat-logo.png";
 interface Props {
   window?: () => Window;
   handleDrawerTransitionEnd: () => void;
@@ -237,6 +238,9 @@ function Sidebar(props: Props) {
             alignItems={"center"}
             gap={4}
           >
+            <IconButton style={{padding:0}}>
+            <img src={logo} height="50px" style={{filter:"grayscale(1)"}}/>
+            </IconButton>
             <IconButton
               sx={{
                 color:
