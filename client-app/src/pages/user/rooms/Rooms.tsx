@@ -48,7 +48,7 @@ function Rooms() {
                 <Typography
                   variant="subtitle2"
                   ml={2}
-                  style={{ textTransform: "capitalize" }}
+                  textTransform="capitalize"
                 >
                   {el.name}
                 </Typography>

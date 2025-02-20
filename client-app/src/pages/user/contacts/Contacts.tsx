@@ -104,8 +104,10 @@ function Contacts() {
               >
                 <ListItemButton
                   sx={{
+                    borderBottom: 1,
+                    borderColor: "grey.300",
                     minHeight: 48,
-                    px: 2.5,
+                    pl:"24px"
                   }}
                   onClick={() =>
                     dispatch({ type: "currentContact", user: el.user as any })
@@ -119,7 +121,7 @@ function Contacts() {
                     <Typography
                       variant="subtitle2"
                       ml={2}
-                      style={{ textTransform: "capitalize" }}
+                      textTransform="capitalize"
                     >
                       {el.user.fullName}
                     </Typography>

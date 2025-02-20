@@ -88,7 +88,7 @@ function AdminLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(true);
   const loaderData = useLoaderData() as IUser;
   const [isClosing, setIsClosing] = React.useState(false);
-  const [parentMessage, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [messageReceived, setMessageReceived] = useState<IMessage[]>([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [activeUsers, setActiveUser] = useState<IActiveUser[]>([]);
@@ -116,20 +116,27 @@ function AdminLayout() {
     }
   };
 
-  async function sendMessage() {
+  async function sendMessage(replyText: string) {
     let payload: any = {
-      parentMessage,
+      message: message,
       room: contextValue.state ? null : (params.id as string),
       isContactEntity: !!contextValue.state,
       sender: loaderData._id,
       contactName: contextValue.state ? contextValue.state._id : null,
     };
     contextValue.state ? delete payload.room : delete payload.contactName;
+    console.log(payload);
+
     await messageService.postMessage(payload);
-    socket.emit("send_message", { message: parentMessage, sender: loaderData });
+    socket.emit("send_message", {
+      message: message,
+      parentMessage: replyText,
+      sender: loaderData,
+    });
     let m = {
       _id: Date.now().toString(),
-      parentMessage,
+      message: message,
+      parentMessage: replyText,
       room: contextValue.state ? null : (params.id as string),
       contactName: contextValue.state,
       isContactEntity: !!contextValue.state,
@@ -139,6 +146,7 @@ function AdminLayout() {
 
     setMessageReceived(messageReceived.concat(m as any));
     setMessage("");
+    setReplyText("");
     if (contentRef.current) {
       let scrollHeight =
         contentRef.current.scrollHeight - contentRef.current.clientHeight;
@@ -151,9 +159,10 @@ function AdminLayout() {
   }
 
   socket.on("receive_message", (data: any) => {
-    console.log(data, messageReceived);
+    console.log(data);
     let m = {
       _id: Date.now().toString(),
+      parentMessage: data.parentMessage,
       message: data.message,
       room: params.id as string,
       sender: data.sender,
@@ -163,10 +172,6 @@ function AdminLayout() {
     };
     setMessageReceived(messageReceived.concat(m as any));
     //setMessageReceived((previous:any) => [...previous,{_id:Date.now().toString(),message:message,room:roomId,sender:loaderData._id}])
-    console.log(
-      contentRef.current?.scrollHeight,
-      contentRef.current?.clientHeight
-    );
     if (contentRef.current) {
       let scrollHeight =
         contentRef.current.scrollHeight - contentRef.current.clientHeight;
@@ -176,7 +181,6 @@ function AdminLayout() {
         behavior: "instant",
       } as any);
     }
-    console.log(m, messageReceived, "received");
   });
 
   socket.on("end_typing", (data) => {
@@ -270,8 +274,8 @@ function AdminLayout() {
         >
           <CssBaseline />
           <Box
-            ref={contentRef}
             overflow={"auto"}
+            ref={contentRef}
             height={`calc(100vh - ${footerHeight ?? 89}px)`}
             sx={{
               backgroundColor:
@@ -301,11 +305,10 @@ function AdminLayout() {
                 flexGrow: 1,
               }}
             >
-              {/* <Toolbar /> */}
               <Stack>
-                <Toolbar />
+                <Toolbar style={{ marginBottom: "16px" }} />
                 {!state?._id && !params.id && (
-                  <Grid container p={4} spacing={3}>
+                  <Grid container px={4} py={2} spacing={3}>
                     <Grid
                       item
                       xs={12}
@@ -382,45 +385,86 @@ function AdminLayout() {
                       }}
                     >
                       <Box
-                        padding="0"
+                        padding="0px"
                         sx={{
                           display: "flex",
-                          justifyContent:"flex-start"
+                          justifyContent: "flex-start",
                         }}
-                        flexDirection = {el.message ? "row" : "row-reverse"}
+                        flexDirection={
+                          el.sender._id == loaderData._id
+                            ? "row-reverse"
+                            : "row"
+                        }
                       >
                         <Image
-                        style={{}}
+                          style={{}}
                           src="https://doot-light.react.themesbrand.com/static/media/avatar-4.474927d6a33a7b8cde52.jpg"
                           alt="loading"
                         />
                         <Stack sx={{ flexDirection: "column-reverse" }}>
                           <Typography
+                            id={el._id}
+                            onClick={(e) => {
+                              setAnchorEl(e.currentTarget);
+                              console.log(el._id);
+                              console.log(anchorEl?.id);
+                            }}
                             maxWidth="400px"
+                            minWidth={
+                              el.parentMessage ? "200px" : "fit-content"
+                            }
                             component={"div"}
                             paragraph
-                            bgcolor={el.parentMessage ? "#1976d2" : "#1976d21c"}
-                            color={el.parentMessage ? "white" : "default"}
+                            bgcolor={
+                              el.sender._id == loaderData._id
+                                ? "#1976d2"
+                                : "#1976d21c"
+                            }
+                            color={
+                              el.sender._id == loaderData._id
+                                ? "white"
+                                : "default"
+                            }
                             sx={{
+                              wordWrap: "break-word",
+                              cursor: "pointer",
                               px: 2,
                               py: 1,
-                              borderRadius: "22px",
+                              borderRadius: "8px",
                               mb: 1,
                               order: el.sender._id === loaderData._id ? 1 : 2,
                             }}
                           >
-                            {el.message ? el.message : el.parentMessage}
+                            {el.parentMessage ? (
+                              <>
+                                <Alert
+                                  sx={{
+                                    mt: 1,
+                                    width: "100%",
+                                    borderLeft: "4px solid green",
+                                  }}
+                                  icon={false}
+                                >
+                                  {el.parentMessage}
+                                </Alert>
+                                <Typography mt={2}>{el.message}</Typography>
+                              </>
+                            ) : (
+                              el.message
+                            )}
                           </Typography>
                           <Typography
                             variant="subtitle2"
-                            flexDirection={{xs: el.message ? "row-reverse" : "row"}}
+                            flexDirection={{
+                              xs:
+                                el.sender._id == loaderData._id
+                                  ? "row"
+                                  : "row-reverse",
+                            }}
                             sx={{
                               display: "flex",
                               alignItems: "center",
-                              justifyContent:
-                                el.sender._id !== loaderData._id
-                                  ? "flex-start"
-                                  : "flex-end",
+                              justifyContent: "flex-end",
                             }}
                           >
                             <DoneAllIcon
@@ -441,86 +485,83 @@ function AdminLayout() {
                               }}
                               date={new Date(el.createdAt) ?? new Date()}
                             />
-
-
-
-
-<IconButton
-                          size="small"
-                          area-label="menu"
-                          id={el._id}
-                          sx={{
-                            order: el.sender._id === loaderData._id ? 1 : 3,
-                          }}
-                          onClick={(e) => setAnchorEl(e.currentTarget)}
-                        >
-                          <MoreVert />
-                        </IconButton>
-                        {el._id === anchorEl?.id && (
-                          <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl)}
-                            onClose={() => setAnchorEl(null)}
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "right",
-                            }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "right",
-                            }}
-                            MenuListProps={{
-                              "aria-labelledby": "basic-button",
-                            }}
-                          >
-                            <MenuItem onClick={() => setAnchorEl(null)}>
-                              <ContentCopy
-                                sx={{
-                                  color: (theme) => theme.palette.grey[600],
-                                  mr: 1,
-                                  fontSize: "16px",
+                            {el._id === anchorEl?.id && (
+                              <Menu
+                                sx={{ mt: "6px" }}
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={() => setAnchorEl(null)}
+                                anchorOrigin={{
+                                  vertical: "bottom",
+                                  horizontal: "right",
                                 }}
-                              />{" "}
-                              Copy
-                            </MenuItem>
-                            <MenuItem onClick={() => setAnchorEl(null)}>
-                              <Edit
-                                sx={{
-                                  color: (theme) => theme.palette.grey[600],
-                                  mr: 1,
-                                  fontSize: "16px",
+                                transformOrigin={{
+                                  vertical: "top",
+                                  horizontal: "right",
                                 }}
-                              />{" "}
-                              Edit
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => {
-                                setAnchorEl(null);
-                                setReplyText(el.parentMessage);
-                              }}
-                            >
-                              <Reply
-                                sx={{
-                                  color: (theme) => theme.palette.grey[600],
-                                  mr: 1,
-                                  fontSize: "16px",
+                                MenuListProps={{
+                                  "aria-labelledby": "basic-button",
                                 }}
-                              />{" "}
-                              Reply
-                            </MenuItem>
-                            <MenuItem onClick={() => setAnchorEl(null)}>
-                              <Delete
-                                color="error"
-                                sx={{ mr: 1, fontSize: "16px", mb: 1 }}
-                              />{" "}
-                              Delete
-                            </MenuItem>
-                          </Menu>
-                        )}
+                              >
+                                <MenuItem
+                                  sx={{ pr: "50px" }}
+                                  onClick={() => setAnchorEl(null)}
+                                >
+                                  <ContentCopy
+                                    sx={{
+                                      color: (theme) => theme.palette.grey[600],
+                                      mr: 1,
+                                      fontSize: "16px",
+                                    }}
+                                  />{" "}
+                                  Copy
+                                </MenuItem>
+                                {el.sender._id == loaderData._id && (
+                                  <MenuItem
+                                    sx={{ pr: "50px" }}
+                                    onClick={() => setAnchorEl(null)}
+                                  >
+                                    <Edit
+                                      sx={{
+                                        color: (theme) =>
+                                          theme.palette.grey[600],
+                                        mr: 1,
+                                        fontSize: "16px",
+                                      }}
+                                    />{" "}
+                                    Edit
+                                  </MenuItem>
+                                )}
 
-
-
+                                <MenuItem
+                                  sx={{ pr: "50px" }}
+                                  onClick={() => {
+                                    setAnchorEl(null);
+                                    setReplyText(el.message);
+                                  }}
+                                >
+                                  <Reply
+                                    sx={{
+                                      color: (theme) => theme.palette.grey[600],
+                                      mr: 1,
+                                      fontSize: "16px",
+                                    }}
+                                  />{" "}
+                                  Reply
+                                </MenuItem>
+                                <MenuItem
+                                  sx={{ pr: "50px" }}
+                                  onClick={() => setAnchorEl(null)}
+                                >
+                                  <Delete
+                                    color="error"
+                                    sx={{ mr: 1, fontSize: "16px" }}
+                                  />{" "}
+                                  Delete
+                                </MenuItem>
+                              </Menu>
+                            )}
                             {/* <Box
                               component={"span"}
                               ml={1}
@@ -539,156 +580,6 @@ function AdminLayout() {
                         </Stack>
                       </Box>
                     </Box>
-
-                    // <Box p={3} key={el._id} bgcolor={"red"}>
-                    //   <Box
-                    //   bgcolor={"blue"}
-                    //     sx={{
-                    //       display: "flex",
-                    //       alignItems: "center",
-                    //       maxWidth: "70%",
-                    //       ml: el.sender._id === loaderData._id ? "auto" : "",
-                    //       width: "fit-content",
-                    //     }}
-                    //     gap={2}
-                    //   >
-                    //     <IconButton
-                    //       size="small"
-                    //       area-label="menu"
-                    //       id={el._id}
-                    //       sx={{
-                    //         order: el.sender._id === loaderData._id ? 1 : 3,
-                    //       }}
-                    //       onClick={(e) => setAnchorEl(e.currentTarget)}
-                    //     >
-                    //       <MoreVert />
-                    //     </IconButton>
-                    //     {el._id === anchorEl?.id && (
-                    //       <Menu
-                    //         id="basic-menu"
-                    //         anchorEl={anchorEl}
-                    //         open={Boolean(anchorEl)}
-                    //         onClose={() => setAnchorEl(null)}
-                    //         anchorOrigin={{
-                    //           vertical: "bottom",
-                    //           horizontal: "right",
-                    //         }}
-                    //         transformOrigin={{
-                    //           vertical: "top",
-                    //           horizontal: "right",
-                    //         }}
-                    //         MenuListProps={{
-                    //           "aria-labelledby": "basic-button",
-                    //         }}
-                    //       >
-                    //         <MenuItem onClick={() => setAnchorEl(null)}>
-                    //           <ContentCopy
-                    //             sx={{
-                    //               color: (theme) => theme.palette.grey[600],
-                    //               mr: 1,
-                    //               fontSize: "16px",
-                    //             }}
-                    //           />{" "}
-                    //           Copy
-                    //         </MenuItem>
-                    //         <MenuItem onClick={() => setAnchorEl(null)}>
-                    //           <Edit
-                    //             sx={{
-                    //               color: (theme) => theme.palette.grey[600],
-                    //               mr: 1,
-                    //               fontSize: "16px",
-                    //             }}
-                    //           />{" "}
-                    //           Edit
-                    //         </MenuItem>
-                    //         <MenuItem
-                    //           onClick={() => {
-                    //             setAnchorEl(null);
-                    //             setReplyText(el.parentMessage);
-                    //           }}
-                    //         >
-                    //           <Reply
-                    //             sx={{
-                    //               color: (theme) => theme.palette.grey[600],
-                    //               mr: 1,
-                    //               fontSize: "16px",
-                    //             }}
-                    //           />{" "}
-                    //           Reply
-                    //         </MenuItem>
-                    //         <MenuItem onClick={() => setAnchorEl(null)}>
-                    //           <Delete
-                    //             color="error"
-                    //             sx={{ mr: 1, fontSize: "16px", mb: 1 }}
-                    //           />{" "}
-                    //           Delete
-                    //         </MenuItem>
-                    //       </Menu>
-                    //     )}
-                    //     <Typography
-                    //       component={"div"}
-                    //       paragraph
-                    //       sx={{
-                    //         backgroundColor: (theme) =>
-                    //           theme.palette.success.contrastText,
-                    //         p: 2,
-                    //         borderRadius: 1,
-                    //         mb: 1,
-                    //         order: el.sender._id === loaderData._id ? 1 : 2,
-                    //       }}
-                    //     >
-                    //       {el.message && (
-                    //         <Alert
-                    //           severity="success"
-                    //           sx={{ mb: 1 }}
-                    //           icon={false}
-                    //         >
-                    //           {el.message}
-                    //         </Alert>
-                    //       )}
-                    //       {el.parentMessage}
-                    //     </Typography>
-                    //     <Avatar>H</Avatar>
-                    //     kAvatar>H</Avatar>
-                    //   </Box>
-                    //   <Typography
-                    //     variant="subtitle2"
-                    //     sx={{
-                    //       display: "flex",
-                    //       alignItems: "center",
-                    //       justifyContent:
-                    //         el.sender._id !== loaderData._id
-                    //           ? "flex-start"
-                    //           : "flex-end",
-                    //     }}
-                    //   >
-                    //     <DoneAllIcon
-                    //       sx={{
-                    //         fontSize: "small",
-                    //         mx: 1,
-                    //         color: theme.palette.info.light,
-                    //         verticalAlign: "middle",
-                    //         order: el.sender._id === loaderData._id ? -1 : 3,
-                    //       }}
-                    //     />
-                    //     <ReactTimeAgo
-                    //       date={new Date(el.createdAt) ?? new Date()}
-                    //     />
-                    //     <Box
-                    //       component={"span"}
-                    //       ml={1}
-                    //       sx={{
-                    //         order: el.sender._id === loaderData._id ? 0 : -1,
-                    //         ml: el.sender._id === loaderData._id ? 1 : "",
-                    //         mr: el.sender._id !== loaderData._id ? 1 : "",
-                    //       }}
-                    //     >
-                    //       {el.sender._id === loaderData._id
-                    //         ? "You"
-                    //         : el.sender.firstName}
-                    //     </Box>
-                    //   </Typography>
-                    // </Box>
                   ))}
               </Stack>
             </Box>
@@ -696,17 +587,34 @@ function AdminLayout() {
           <Box
             component={"footer"}
             sx={{
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[800],
               mt: "auto",
-              pb: 3,
+              p: 2,
               display: state?._id || params.id ? "" : "none",
+              position: "sticky",
+              bottom: "0",
             }}
             ref={ref}
           >
-            <Divider sx={{ mb: 3 }} />
-            <Stack direction={"row"} px={3}>
+            <Stack
+              direction={"row"}
+              px={1}
+              bgcolor={theme.palette.mode === "light" ? "white" : "black"}
+              borderRadius="30px"
+              alignItems="center"
+            >
               <IconButton
                 onClick={() => setPicker((prev) => !prev)}
-                sx={{ mr: 1, flexBasis: "61px" }}
+                sx={{
+                  mr: 2,
+                  backgroundColor:
+                    theme.palette.mode === "light"
+                      ? theme.palette.grey[100]
+                      : theme.palette.grey[800],
+                }}
               >
                 <InsertEmoticonIcon />{" "}
               </IconButton>
@@ -715,33 +623,67 @@ function AdminLayout() {
                   onEmojiClick={(i, e) => onEmojiClick(i, e)}
                   style={{
                     position: "absolute",
-                    transform: "translateY(-102%)",
+                    transform: replyText
+                      ? "translateY(-65%)"
+                      : "translateY(-58%)",
                     zIndex: 11111,
-                    left: "-8%",
+                    left: "1%",
                   }}
                 />
               )}
-              <TextField
-                multiline
-                fullWidth
-                value={parentMessage}
-                rows={2}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyUp={(e) => handleKeyUp()}
-                variant="outlined"
-                sx={{
-                  mr: 3,
-                  "& .MuiInputBase-multiline": {
-                    py: 1,
-                  },
-                }}
-              />
+              <Stack direction={replyText ? "column" : "row"} width={"100%"}>
+                {replyText && (
+                  <Alert
+                    sx={{ mt: 1, width: "100%", borderLeft: "3px solid green" }}
+                    icon={false}
+                    action={
+                      <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                          setReplyText("");
+                        }}
+                      >
+                        <Close fontSize="inherit" />
+                      </IconButton>
+                    }
+                  >
+                    {" "}
+                    {replyText}
+                  </Alert>
+                )}
+                <TextField
+                  multiline
+                  fullWidth
+                  value={message}
+                  rows={2}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyUp={(e) => handleKeyUp()}
+                  variant="standard"
+                  sx={{
+                    "& .MuiInputBase-multiline": {
+                      py: 1,
+                    },
+                    "& .MuiInputBase-multiline::before": {
+                      borderBottom: "none",
+                    },
+                  }}
+                />
+              </Stack>
               <Button
-                onClick={sendMessage}
-                sx={{ alignSelf: "center" }}
+                onClick={() => sendMessage(replyText)}
+                sx={{
+                  ml: 2,
+                  alignSelf: "center",
+                  borderRadius: "50%",
+                  height: "40px",
+                  minWidth: "40px",
+                  width: "40px",
+                }}
                 variant="contained"
               >
-                <SendIcon />
+                <SendIcon fontSize="small" />
               </Button>
             </Stack>
           </Box>
@@ -753,28 +695,6 @@ function AdminLayout() {
               width: "100%",
             }}
           >
-            <Collapse in={!!replyText}>
-              <Alert
-                sx={{ m: 3 }}
-                severity="success"
-                icon={false}
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => {
-                      setReplyText("");
-                    }}
-                  >
-                    <Close fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                {" "}
-                {replyText}
-              </Alert>
-            </Collapse>
           </Paper>
         </Box>
       </UserContext.Provider>

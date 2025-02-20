@@ -29,7 +29,6 @@ function RoomsUser() {
   const { state, dispatch } = userContext;
 
   React.useEffect(() => {
-    console.log(roomsData);
     dispatch({ type: "group", group: roomsData[0] });
   }, []);
   const activeUserContext = useOutletContext() as IActiveUser[];
@@ -80,7 +79,7 @@ function RoomsUser() {
                       alt="loading"
                     />
                   </Badge>
-                  <Typography variant="subtitle2" ml={2} style={{textTransform:"capitalize"}}>
+                  <Typography variant="subtitle2" ml={2} textTransform="capitalize">
                     {user.firstName + " " + user.lastName}
                   </Typography>
                 </Stack>

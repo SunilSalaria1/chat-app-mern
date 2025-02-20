@@ -30,12 +30,12 @@ const getMessages = async (req, res) => {
     } */
 
   try {
-    let messages;
-    if (Object.keys(req.query).length === 0) {
-      messages = await Message.find({ room: req.params.id }).populate("sender", { password: 0, confirmPassword: 0, __v: 0 });
-    } else {
-      messages = await Message.find({ contactName: req.params.id }).populate("sender", { password: 0, confirmPassword: 0, __v: 0 });
-    }
+    let messages =await Message.find({ contactName: req.params.id }).populate("sender", { password: 0, confirmPassword: 0, __v: 0,tokens:0 });
+    // if (Object.keys(req.query).length === 0) {
+    //   messages = await Message.find({ room: req.params.id }).populate("sender", { password: 0, confirmPassword: 0, __v: 0,tokens:0 });
+    // } else {
+    //   messages = await Message.find({ contactName: req.params.id }).populate("sender", { password: 0, confirmPassword: 0, __v: 0,tokens:0 });
+    // }
     res.status(200).send(messages);
   } catch (error) {
     if (error instanceof HttpError) {

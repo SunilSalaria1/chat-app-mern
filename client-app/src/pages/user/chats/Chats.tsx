@@ -28,8 +28,8 @@ const myContactsService = new ContactService();
 function Chats() {
   const [value, setValue] = useState<string>("");
   const [contacts, setContacts] = useState<
-    { isFavoriteUser: boolean; user: IUser; _id: string }[]
-  >([]);
+      { isFavoriteUser: boolean; user: { fullName: string; _id: string } }[]
+    >([] as any);
   const currentUser = useContext(CurrentUserContext) as IUser;
 
   useEffect(() => {
@@ -82,14 +82,13 @@ function Chats() {
         ></TextField>
       </Toolbar>
       <Divider />
-      {/* <Box>
+      <Box>
         <List>
           <ListItem disablePadding sx={{ display: "block" }}>
             {contacts
-              // ?.filter((el) => el.user.firstName.toLowerCase().indexOf(value.toLowerCase()) > -1 || el.user.lastName.toLowerCase().indexOf(value.toLowerCase()) > -1)
               .map((el) => (
                 <ListItemButton
-                  key={el._id}
+                  key={el.user._id}
                   sx={{
                     minHeight: 48,
                     px: 2.5,
@@ -100,8 +99,8 @@ function Chats() {
                       src="https://doot-light.react.themesbrand.com/static/media/avatar-4.474927d6a33a7b8cde52.jpg"
                       alt="loading"
                     />
-                    <Typography variant="subtitle2" ml={2}>
-                      {el.user.firstName + " " + el.user.lastName}
+                    <Typography variant="subtitle2" ml={2} textTransform="capitalize">
+                      {el.user.fullName}
                     </Typography>
                   </Stack>
                 </ListItemButton>
@@ -110,8 +109,7 @@ function Chats() {
         </List>
         {contacts?.filter(
           (el) =>
-            el.user.firstName.toLowerCase().indexOf(value.toLowerCase()) > -1 ||
-            el.user.lastName.toLowerCase().indexOf(value.toLowerCase()) > -1
+            el.user.fullName.toLowerCase().indexOf(value.toLowerCase()) > -1
         ).length === 0 && (
           <Typography
             sx={{
@@ -124,7 +122,7 @@ function Chats() {
             No result found
           </Typography>
         )}
-      </Box> */}
+      </Box>
     </>
   );
 }

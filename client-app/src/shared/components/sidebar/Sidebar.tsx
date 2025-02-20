@@ -238,7 +238,8 @@ function Sidebar(props: Props) {
             alignItems={"center"}
             gap={4}
           >
-            <IconButton style={{padding:0}}>
+            <IconButton style={{padding:0}}  component={Link}
+                to="/">
             <img src={logo} height="50px" style={{filter:"grayscale(1)"}}/>
             </IconButton>
             <IconButton

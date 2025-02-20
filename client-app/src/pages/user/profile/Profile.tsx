@@ -52,13 +52,13 @@ function Profile() {
       />
     </Paper>
     <Box textAlign={'center'}>
-      <Typography variant="h6">{currentUser?.firstName}</Typography>
+      <Typography variant="h6" textTransform="capitalize">{currentUser?.firstName}</Typography>
       <Typography variant="subtitle2" paragraph>
         Frontend Developer
       </Typography>
       <Divider/>
       <Stack p={3} gap={2}>
-        <Box display={'flex'} gap={1}><Person sx={{flexBasis:'10%',color:(theme)=>theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.common.white}}/> {currentUser?.firstName + " " + currentUser?.lastName}</Box>
+        <Box style={{textTransform:"capitalize"}} display={'flex'} gap={1}><Person sx={{flexBasis:'10%',color:(theme)=>theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.common.white}}/> {currentUser?.firstName + " " + currentUser?.lastName}</Box>
         <Box display={'flex'} gap={1}><Email sx={{flexBasis:'10%',color:(theme)=>theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.common.white}}/> {currentUser?.email}</Box>
         <Box display={'flex'} gap={1}><LocationOn sx={{flexBasis:'10%',color:(theme)=>theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.common.white}}/> California, USA</Box>
       </Stack>

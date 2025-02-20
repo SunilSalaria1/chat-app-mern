@@ -48,7 +48,7 @@ function ChatProfile({currentUser}:{currentUser:IUser}) {
 				/>
 			</Paper>
 			<Box textAlign={'center'}>
-				<Typography variant="h6">{currentUser.firstName}</Typography>
+				<Typography variant="h6" textTransform="capitalize">{currentUser.firstName}</Typography>
 				<Typography variant="subtitle2" paragraph>
 					Frontend Developer
 				</Typography>
