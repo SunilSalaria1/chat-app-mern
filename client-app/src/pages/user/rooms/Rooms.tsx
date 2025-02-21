@@ -8,12 +8,28 @@ import {
   Stack,
   styled,
 } from "@mui/material";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, Link } from "react-router-dom";
-import { IRoom } from "../../../shared/models";
-
+import { IRoom, IUser } from "../../../shared/models";
+import RoomService from "../../../shared/services/rooms.service";
+import { CurrentUserContext } from "../../../shared/context/context";
+const roomService = new RoomService();
 function Rooms() {
-  const roomsData = useLoaderData() as IRoom[];
+  const [roomsData, setRooms] = useState([] as IRoom[]);
+  const currentUser = useContext(CurrentUserContext) as IUser;
+
+  useEffect(() => {
+    const getRoomsByUserId = async () => {
+      try {
+        const rooms = await roomService.getRoomsByUserId(currentUser._id);
+        setRooms(rooms);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getRoomsByUserId();
+  }, []);
+
   const Image = styled("img")(({ theme }) => ({
     height: "20px",
     width: "20px",
@@ -28,14 +44,14 @@ function Rooms() {
         Favorites
       </Typography>
       <List>
-        {roomsData.map((el) => (
-          <ListItem disablePadding sx={{ display: "block"}} key={el._id}>
+        {roomsData.length > 0 &&roomsData.map((el) => (
+          <ListItem disablePadding sx={{ display: "block" }} key={el._id}>
             <ListItemButton
               sx={{
                 borderBottom: 1,
                 borderColor: "grey.300",
                 minHeight: 48,
-				pl:"24px"
+                pl: "24px",
               }}
               component={Link}
               to={el._id}

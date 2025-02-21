@@ -6,7 +6,9 @@ import router from "./shared/router/router";
 import { createTheme } from "@mui/material";
 import { ThemeModeContext } from "./shared/context/context";
 import theme from "./theme";
-export const socket = io("http://localhost:3100");
+export const socket = io("http://localhost:3100", {
+  auth: { token: localStorage.getItem("token") ?? "" },
+});
 
 export function App() {
   const [mode, setMode] = useState<"light" | "dark">("light");

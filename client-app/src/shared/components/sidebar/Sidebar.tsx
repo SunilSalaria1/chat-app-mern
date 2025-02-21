@@ -93,9 +93,15 @@ function Sidebar(props: Props) {
     }
   };
   useEffect(() => {
-    roomsService.getRooms().then((rooms) => {
-      setRoom(rooms);
-    });
+    const getRoomsByUserId = async () => {
+      try {
+        const rooms = await roomsService.getRoomsByUserId(currentUser._id);
+        setRoom(rooms);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getRoomsByUserId();
   }, []);
 
   const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (

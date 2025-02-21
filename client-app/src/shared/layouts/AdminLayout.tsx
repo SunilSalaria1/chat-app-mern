@@ -67,7 +67,7 @@ const timeAgo = new TimeAgo("en-US");
 interface IMessage {
   _id: string;
   message: string;
-  parentMessage: string;
+  parentMessage: IMessage;
   room: string | null;
   contactName: IUser | null;
   sender: IUser;
@@ -99,7 +99,7 @@ function AdminLayout() {
   const params = useParams();
   const [footerHeight, setFooterHeight] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [replyText, setReplyText] = React.useState<string>("");
+  const [replyText, setReplyText] = React.useState<{message:string,_id:string}>({message:"",_id:""});
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -116,37 +116,31 @@ function AdminLayout() {
     }
   };
 
-  async function sendMessage(replyText: string) {
-    let payload: any = {
-      message: message,
-      room: contextValue.state ? null : (params.id as string),
-      isContactEntity: !!contextValue.state,
-      sender: loaderData._id,
-      contactName: contextValue.state ? contextValue.state._id : null,
-    };
-    contextValue.state ? delete payload.room : delete payload.contactName;
-    console.log(payload);
+  socket.emit('joinRoom', params.id);
 
-    await messageService.postMessage(payload);
+  async function sendMessage(reply: string) {
+
+    console.log(replyText._id)
     socket.emit("send_message", {
       message: message,
-      parentMessage: replyText,
+      parentMessage: replyText._id,
+      room: (params.id as string),
       sender: loaderData,
     });
-    let m = {
-      _id: Date.now().toString(),
-      message: message,
-      parentMessage: replyText,
-      room: contextValue.state ? null : (params.id as string),
-      contactName: contextValue.state,
-      isContactEntity: !!contextValue.state,
-      sender: loaderData,
-      createdAt: new Date(),
-    };
+    // let m = {
+    //   _id: Date.now().toString(),
+    //   message: message,
+    //   parentMessage: reply,
+    //   room: contextValue.state ? null : (params.id as string),
+    //   contactName: contextValue.state,
+    //   isContactEntity: !!contextValue.state,
+    //   sender: loaderData,
+    //   createdAt: new Date(),
+    // };
 
-    setMessageReceived(messageReceived.concat(m as any));
+    // setMessageReceived(messageReceived.concat(m as any));
     setMessage("");
-    setReplyText("");
+    setReplyText({message:"",_id:""});
     if (contentRef.current) {
       let scrollHeight =
         contentRef.current.scrollHeight - contentRef.current.clientHeight;
@@ -207,13 +201,13 @@ function AdminLayout() {
   useEffect(() => {
     if (contextValue.state) {
       messageService
-        .getMessageByRoomId(contextValue.state._id, true)
+        .getMessageByRoomId(params.id as string)
         .then((messages) => {
           setMessageReceived(messages);
         });
     } else {
       messageService
-        .getMessageByRoomId("665582143a33f99eb38f3b01")
+        .getMessageByRoomId(params.id as string)
         .then((messages) => {
           setMessageReceived(messages);
         });
@@ -406,8 +400,6 @@ function AdminLayout() {
                             id={el._id}
                             onClick={(e) => {
                               setAnchorEl(e.currentTarget);
-                              console.log(el._id);
-                              console.log(anchorEl?.id);
                             }}
                             maxWidth="400px"
                             minWidth={
@@ -445,7 +437,7 @@ function AdminLayout() {
                                   }}
                                   icon={false}
                                 >
-                                  {el.parentMessage}
+                                  {el.parentMessage.message}
                                 </Alert>
                                 <Typography mt={2}>{el.message}</Typography>
                               </>
@@ -538,7 +530,8 @@ function AdminLayout() {
                                   sx={{ pr: "50px" }}
                                   onClick={() => {
                                     setAnchorEl(null);
-                                    setReplyText(el.message);
+                                    console.warn(el,'new')
+                                    setReplyText((prev)=>({...prev,message:el.message,_id:el._id}));
                                   }}
                                 >
                                   <Reply
@@ -623,7 +616,7 @@ function AdminLayout() {
                   onEmojiClick={(i, e) => onEmojiClick(i, e)}
                   style={{
                     position: "absolute",
-                    transform: replyText
+                    transform: replyText.message
                       ? "translateY(-65%)"
                       : "translateY(-58%)",
                     zIndex: 11111,
@@ -631,8 +624,8 @@ function AdminLayout() {
                   }}
                 />
               )}
-              <Stack direction={replyText ? "column" : "row"} width={"100%"}>
-                {replyText && (
+              <Stack direction={replyText.message ? "column" : "row"} width={"100%"}>
+                {replyText.message && (
                   <Alert
                     sx={{ mt: 1, width: "100%", borderLeft: "3px solid green" }}
                     icon={false}
@@ -642,7 +635,7 @@ function AdminLayout() {
                         color="inherit"
                         size="small"
                         onClick={() => {
-                          setReplyText("");
+                          setReplyText({message:"",_id:""});
                         }}
                       >
                         <Close fontSize="inherit" />
@@ -650,7 +643,7 @@ function AdminLayout() {
                     }
                   >
                     {" "}
-                    {replyText}
+                    {replyText.message}
                   </Alert>
                 )}
                 <TextField
@@ -672,7 +665,7 @@ function AdminLayout() {
                 />
               </Stack>
               <Button
-                onClick={() => sendMessage(replyText)}
+                onClick={() => sendMessage(replyText.message)}
                 sx={{
                   ml: 2,
                   alignSelf: "center",

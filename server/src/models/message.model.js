@@ -14,6 +14,11 @@ const messageSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    room: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room',
+        default:null,
+    },
 }, { timestamps: true })
 
 const Message = mongoose.model('Message', messageSchema);

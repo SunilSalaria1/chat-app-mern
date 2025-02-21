@@ -11,7 +11,7 @@ export default class MessageService{
         }).then(response => response.json());
      }
 
-     public async getMessageByRoomId(roomId:string,isContentEntity:boolean = false):Promise<any>{
-        return await fetch(config.apiUrl+'/api/message/'+roomId+''+(isContentEntity ? '?isContentEntity=true':'')).then(response => response.json());
+     public async getMessageByRoomId(roomId:string):Promise<any>{
+        return await fetch(config.apiUrl+'/api/rooms/'+roomId+'/messages').then(response => response.json());
      }
 }

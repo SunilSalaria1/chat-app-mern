@@ -57,7 +57,6 @@ const router = createBrowserRouter([
       },
       {
         path: "rooms",
-        loader: async () => await roomService.getRooms(),
         lazy: async () => {
           let Rooms = (await import("../../pages/user/rooms/Rooms")).default;
           return { Component: Rooms };
@@ -65,7 +64,6 @@ const router = createBrowserRouter([
       },
       {
         path: "rooms/:id",
-        loader: async () => await roomService.getRooms(),
         lazy: async () => {
           let UserRooms = (await import("../../pages/user/roomsUser/RoomsUser"))
             .default;

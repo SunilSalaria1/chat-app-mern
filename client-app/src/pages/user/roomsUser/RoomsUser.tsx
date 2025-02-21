@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, useOutletContext } from "react-router-dom";
-import { IRoom } from "../../../shared/models";
+import { IRoom, IUser } from "../../../shared/models";
 import styled from "@emotion/styled";
 import {
   Toolbar,
@@ -18,13 +18,28 @@ import {
   CardActions,
 } from "@mui/material";
 import { IActiveUser } from "../../../shared/layouts/AdminLayout";
-import { IUserContext, UserContext } from "../../../shared/context/context";
+import { CurrentUserContext, IUserContext, UserContext } from "../../../shared/context/context";
 import { Dispatch } from "react";
 import { red } from "@mui/material/colors";
 import MenuIcon from "@mui/icons-material/Menu";
+import RoomService from "../../../shared/services/rooms.service";
+const roomService = new RoomService();
 
 function RoomsUser() {
-  const roomsData = useLoaderData() as IRoom[];
+    const [roomsData, setRooms] = useState([] as IRoom[]);
+  const currentUser = useContext(CurrentUserContext) as IUser;
+
+  useEffect(() => {
+    const getRoomsByUserId = async () => {
+      try {
+        const rooms = await roomService.getRoomsByUserId(currentUser._id);
+        setRooms(rooms);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getRoomsByUserId();
+  }, []);
   const userContext = React.useContext(UserContext) as IUserContext;
   const { state, dispatch } = userContext;
 
@@ -45,7 +60,7 @@ function RoomsUser() {
         Favorites
       </Typography>
       <List>
-          {roomsData.map((el) =>
+          {roomsData.length && roomsData.map((el) =>
             el.members.map((user) => (
               <ListItem disablePadding sx={{ display: "block" }} key={user._id}>
               <ListItemButton

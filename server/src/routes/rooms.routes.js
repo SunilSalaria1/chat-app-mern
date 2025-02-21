@@ -5,11 +5,13 @@ const {
   getRooms,
   updateRoom,
   deleteRoom,
+  getRoomsByUserId
 } = require("../controllers/room.controller");
 
-roomRoutes.post("/rooms", createRoom);
 roomRoutes.get("/rooms", getRooms);
-roomRoutes.put("/rooms/:id", updateRoom);
-roomRoutes.delete("/rooms/:id", deleteRoom);
+roomRoutes.post("/rooms", createRoom);
+roomRoutes.get("/users/:id/rooms", getRoomsByUserId);
+roomRoutes.put("/users/:id/rooms/:roomId", updateRoom);
+roomRoutes.delete("/users/:id/rooms/:roomId", deleteRoom);
 
 module.exports = roomRoutes;
