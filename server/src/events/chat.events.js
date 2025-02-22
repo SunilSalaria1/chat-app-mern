@@ -2,7 +2,6 @@ const axios = require("axios");
 const chatEvents = (io, socket) => {
   socket.on("send_message", async (data) => {
     try {
-      console.log(data, "message");
       // Ensure the sender is the authenticated user
       if (data.sender._id !== socket.user._id) {
         return socket.emit("errorMessage", { error: "Unauthorized action" });
@@ -17,31 +16,52 @@ const chatEvents = (io, socket) => {
       );
 
       let savedMessage = response.data;
-       console.log(savedMessage,'parnet')
       if (savedMessage?.parentMessage) {
-        console.log('api')
         const response = await axios.get(
-          "http://localhost:3100/api/message" + savedMessage._id,
+          "http://localhost:3100/api/message/" + savedMessage._id,
           {
             headers: { Authorization: `Bearer ${socket.user.token}` },
           }
         );
-        console.log(response.data, 'response')
         savedMessage = response.data;
-        console.log("parent called")
+        // broadcast message to the room
         io.to(data.room).emit("receive_message", savedMessage);
-      }else{
-        console.log(savedMessage)
+      } else {
+        // broadcast message to the room
         io.to(data.room).emit("receive_message", savedMessage);
       }
-      console.log(savedMessage,data.room,'callled');
+
       // broadcast message to the room
-     
     } catch (error) {
       //   console.error("Message saving failed:", error);
       socket.emit("errorMessage", { error: "Could not send message" });
     }
-    socket.broadcast.emit("receive_message", data);
+    // socket.broadcast.emit("receive_message", data);
+  });
+
+  socket.on("deleteMessage", async (data) => {
+    try {
+      console.log(data)
+      // Ensure the sender is the authenticated user
+      if (data.sender._id !== socket.user._id) {
+        return socket.emit("errorMessage", { error: "Unauthorized action" });
+      }
+
+      const response = await axios.delete(
+        "http://localhost:3100/api/message/"+data.id,
+        {
+          headers: { Authorization: `Bearer ${socket.user.token}` },
+        }
+      );
+
+      let deletedMessageResponse = response.data;
+      console.log(deletedMessageResponse)
+      // broadcast message to the room
+      io.to(data.room).emit("message_deleted", data.id);
+    } catch (error) {
+    console.error("Message saving failed:", error);
+      socket.emit("errorMessage", { error: "Could not send message" });
+    }
   });
 
   socket.on("joinRoom", (room) => {

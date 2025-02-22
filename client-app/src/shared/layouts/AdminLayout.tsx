@@ -69,10 +69,9 @@ interface IMessage {
   message: string;
   parentMessage: IMessage;
   room: string | null;
-  contactName: IUser | null;
+  isEdit: boolean;
   sender: IUser;
   createdAt: Date;
-  isContactEntity: boolean;
 }
 
 export interface IActiveUser {
@@ -100,7 +99,7 @@ function AdminLayout() {
   const [footerHeight, setFooterHeight] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [replyText, setReplyText] = React.useState<{message:string,_id:string}>({message:"",_id:""});
-
+  
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -127,18 +126,6 @@ function AdminLayout() {
       room: (params.id as string),
       sender: loaderData,
     });
-    // let m = {
-    //   _id: Date.now().toString(),
-    //   message: message,
-    //   parentMessage: reply,
-    //   room: contextValue.state ? null : (params.id as string),
-    //   contactName: contextValue.state,
-    //   isContactEntity: !!contextValue.state,
-    //   sender: loaderData,
-    //   createdAt: new Date(),
-    // };
-
-    // setMessageReceived(messageReceived.concat(m as any));
     setMessage("");
     setReplyText({message:"",_id:""});
     if (contentRef.current) {
@@ -152,20 +139,17 @@ function AdminLayout() {
     }
   }
 
-  socket.on("receive_message", (data: any) => {
+  const deleteMessageById = (_id:string) => {
+    socket.emit("deleteMessage", {
+      id: _id,
+      sender: loaderData,
+      room: params.id
+    });
+  }
+
+  socket.on("receive_message", (data: IMessage) => {
     console.log(data);
-    let m = {
-      _id: Date.now().toString(),
-      parentMessage: data.parentMessage,
-      message: data.message,
-      room: params.id as string,
-      sender: data.sender,
-      isContactEntity: !!contextValue.state,
-      contactName: contextValue.state,
-      createdAt: new Date(),
-    };
-    setMessageReceived(messageReceived.concat(m as any));
-    //setMessageReceived((previous:any) => [...previous,{_id:Date.now().toString(),message:message,room:roomId,sender:loaderData._id}])
+    setMessageReceived(messageReceived.concat(data));
     if (contentRef.current) {
       let scrollHeight =
         contentRef.current.scrollHeight - contentRef.current.clientHeight;
@@ -176,6 +160,11 @@ function AdminLayout() {
       } as any);
     }
   });
+
+  socket.on("message_deleted",(data)=>{
+    const messages = messageReceived.filter(el=> el._id !== data)
+    setMessageReceived(messages);
+  })
 
   socket.on("end_typing", (data) => {
     console.log("typing", data);
@@ -368,7 +357,7 @@ function AdminLayout() {
                     </Grid>
                   </Grid>
                 )}
-                {(state?._id || params.id) &&
+                {(state?._id || params.id) && messageReceived.length > 0 &&
                   messageReceived?.map((el) => (
                     <Box
                       p={1}
@@ -408,12 +397,12 @@ function AdminLayout() {
                             component={"div"}
                             paragraph
                             bgcolor={
-                              el.sender._id == loaderData._id
+                              el.sender._id === loaderData._id
                                 ? "#1976d2"
                                 : "#1976d21c"
                             }
                             color={
-                              el.sender._id == loaderData._id
+                              el.sender._id === loaderData._id
                                 ? "white"
                                 : "default"
                             }
@@ -449,7 +438,7 @@ function AdminLayout() {
                             variant="subtitle2"
                             flexDirection={{
                               xs:
-                                el.sender._id == loaderData._id
+                                el.sender._id === loaderData._id
                                   ? "row"
                                   : "row-reverse",
                             }}
@@ -509,10 +498,12 @@ function AdminLayout() {
                                   />{" "}
                                   Copy
                                 </MenuItem>
-                                {el.sender._id == loaderData._id && (
+                                {el.sender._id === loaderData._id && (
                                   <MenuItem
                                     sx={{ pr: "50px" }}
-                                    onClick={() => setAnchorEl(null)}
+                                    onClick={() => {setAnchorEl(null);
+                          
+                                    }}
                                   >
                                     <Edit
                                       sx={{
@@ -545,12 +536,12 @@ function AdminLayout() {
                                 </MenuItem>
                                 <MenuItem
                                   sx={{ pr: "50px" }}
-                                  onClick={() => setAnchorEl(null)}
+                                  onClick={() =>{ setAnchorEl(null);deleteMessageById(el._id);}}
                                 >
                                   <Delete
                                     color="error"
                                     sx={{ mr: 1, fontSize: "16px" }}
-                                  />{" "}
+                                  />
                                   Delete
                                 </MenuItem>
                               </Menu>
